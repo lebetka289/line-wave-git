@@ -115,7 +115,7 @@
             const scrollLeft = () => {
                 scrollRef.current.scrollBy({
                     top: 0,
-                    left: -300, 
+                    left: -300,
                     behavior: 'smooth'
                 });
             };
@@ -123,7 +123,7 @@
             const scrollRight = () => {
                 scrollRef.current.scrollBy({
                     top: 0,
-                    left: 300, 
+                    left: 300,
                     behavior: 'smooth'
                 });
             };
@@ -227,7 +227,11 @@
                     <div className="control">
                         <button className="prev-button" onClick={onPrev}>⏮️</button>
                         <button className="play-pause-button" onClick={onPlayPause}>
-                            {isPlaying ? '⏸️' : '▶️'}
+                            {isPlaying ? (
+                                <img src="img/pause.svg" alt="Pause" className="pause-icon" />
+                            ) : (
+                                <img src="img/play.svg" alt="Pause" className="pause-icon" />
+                            )}
                         </button>
                         <button className="next-button" onClick={onNext}>⏭️</button>
                     </div>
@@ -312,7 +316,7 @@
                                 src={track.audioPath}
                                 onTimeUpdate={handleTimeUpdate}
                                 onEnded={nextTrack} // Переход к следующему треку при завершении текущего
-                                autoPlay={isPlaying} 
+                                autoPlay={isPlaying}
                             />
                             <div className="player-controls">
                                 <img src={album.imagePath} alt="Track Cover" className="track-cover" />
