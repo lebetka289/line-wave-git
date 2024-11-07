@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LINE WAVE</title>
+    <script src="https://unpkg.com/react@18.2.0/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone@7.18.5/babel.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Carrois+Gothic&family=Oswald:wght@200..700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Unbounded:wght@200..900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="./data.js"></script>
+</head>
+
+<body>
+
+    <header>
+        <div id="root"></div>
+    </header>
+
+    <script type="text/babel">
+        const SearchBar = () => {
+            return (
+                <div className="search-bar">
+                    <input type="text" placeholder="Найти исполнителя" />
+                </div>
+            );
+        };
+
+        const Sidebar = () => {
+            return (
+                <div className="sidebar">
+                    <div className="playlists">
+                        <h2>Мои Плейлисты</h2>
+                        <button className="create-playlist-btn">Создать плейлист</button>
+                    </div>
+                </div>
+            );
+        };
+
+        const MainContent = ({ onTrackClick }) => {
+            return (
+                <div className="main-content">
+                    <SearchBar />
+                    <Categories onTrackClick={onTrackClick} />
+                    <MoodGenres />
+                    <CustomCategory onTrackClick={onTrackClick} />
+                    <footer className="footer">
+                        <div className="footer-container">
+                            <div className="footer-section">
+                                <h3>Компания</h3>
+                                <ul>
+                                    <li><a href="#">О нас</a></li>
+                                    <li><a href="#">Справка</a></li>
+                                    <li><a href="#">Для исполнителей</a></li>
+                                </ul>
+                            </div>
+                            <div className="footer-section">
+                                <h3>Сообщества</h3>
+                                <ul>
+                                    <li><a href="#">Реклама</a></li>
+                                    <li><a href="#">Для инвесторов</a></li>
+                                    <li><a href="#">Для разработчиков</a></li>
+                                    <li><a href="#">Для вендоров</a></li>
+                                </ul>
+                            </div>
+                            <div className="footer-section">
+                                <h3>Полезные ссылки</h3>
+                                <ul>
+                                    <li><a href="#">Бесплатное мобильное приложение</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div className="footer-bottom">
+                            <div className="footer-bottom-links">
+                                <ul>
+                                    <li><a href="#">Юридическая информация</a></li>
+                                    <li><a href="#">Специальные возможности</a></li>
+                                    <li><a href="#">Настройка файлов cookie</a></li>
+                                    <li><a href="#">О рекламе</a></li>
+                                    <li><a href="#">Политика конфиденциальности</a></li>
+                                </ul>
+                            </div>
+                            <div className="footer-social">
+                                <a href="#"><img src="img/vk-icon.svg" alt="VK" /></a>
+                                <a href="#"><img src="img/telegram-icon.svg" alt="Telegram" /></a>
+                                <a href="#"><img src="img/youtube-icon.svg" alt="YouTube" /></a>
+                            </div>
+                        </div>
+                    </footer>
+                </div>
+            );
+        };
+
+        const Categories = ({ onTrackClick }) => {
+            const [shuffledAlbums, setShuffledAlbums] = React.useState([]);
+
+            const shuffleAlbums = () => {
+                return albumDatabase.sort(() => Math.random() - 0.5); // Случайная сортировка
+            };
+
+            // Сортируем альбомы только при монтировании компонента (один раз)
+            React.useEffect(() => {
+                const albums = shuffleAlbums();
+                setShuffledAlbums(albums);
+            }, []); // Пустой массив зависимостей, чтобы выполнить только один раз при монтировании
+
+            const scrollRef = React.useRef(null);
+
+            const scrollLeft = () => {
+                scrollRef.current.scrollBy({
+                    top: 0,
+                    left: -300, 
+                    behavior: 'smooth'
+                });
+            };
+
+            const scrollRight = () => {
+                scrollRef.current.scrollBy({
+                    top: 0,
+                    left: 300, 
+                    behavior: 'smooth'
+                });
+            };
+
+            const handleTrackClick = (track, album) => {
+                onTrackClick(track, album);
+            };
+
+            return (
+                <div className="categories-section">
+                    <h2 className="categories-title">Новые релизы</h2>
+
+                    <button className="scroll-button left" onClick={scrollLeft}>⬅️</button>
+                    <div className="categories" ref={scrollRef}>
+                        {shuffledAlbums.map((album) => (
+                            <div key={album.id} className="album">
+                                <img src={album.imagePath} alt={album.title} className="album-cover" />
+                                <div className="play-btn" onClick={() => handleTrackClick(album.tracks[0], album)}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+                                        <polygon points="8,5 8,19 19,12"></polygon>
+                                    </svg>
+                                </div>
+                                <div className="album-info">
+                                    <h3>{album.title}</h3>
+                                    <p>{album.artist} - {album.year}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <button className="scroll-button right" onClick={scrollRight}>➡️</button>
+                </div>
+            );
+        };
+
+        const MoodGenres = () => {
+            const genres = [
+                'Русский хип-хоп',
+                'Поп',
+                'Танцы и электроника',
+                'Рок',
+                'Хип-хоп',
+                'Фолк и акустика',
+            ];
+
+            return (
+                <div className="mood-genres">
+                    {genres.map((genre, index) => (
+                        <button key={index} className="genre-button">{genre}</button>
+                    ))}
+                </div>
+            );
+        };
+
+        // Новый компонент для второй категории
+        const CustomCategory = ({ onTrackClick }) => {
+            const [customAlbums, setCustomAlbums] = React.useState(albumDatabase);
+
+            // В этой версии мы просто случайно сортируем альбомы при монтировании компонента
+            React.useEffect(() => {
+                const shuffled = [...albumDatabase].sort(() => Math.random() - 0.5); // Случайная сортировка
+                setCustomAlbums(shuffled);
+            }, []);
+
+            const handleTrackClick = (track, album) => {
+                onTrackClick(track, album);
+            };
+
+            return (
+                <div className="categories-section">
+                    <h2 className="categories-title">В вашем стиле</h2>
+                    <div className="categories">
+                        {customAlbums.map((album) => (
+                            <div key={album.id} className="album">
+                                <img src={album.imagePath} alt={album.title} className="album-cover" />
+                                <div className="play-btn" onClick={() => handleTrackClick(album.tracks[0], album)}>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+                                        <polygon points="8,5 8,19 19,12"></polygon>
+                                    </svg>
+                                </div>
+                                <div className="album-info">
+                                    <h3>{album.title}</h3>
+                                    <p>{album.artist} - {album.year}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <button className="scroll-button right">➡️</button>
+                </div>
+            );
+        };
+
+        const MusicPlayer = ({ onPlayPause, isPlaying, progress, onSeek, onPrev, onNext, onVolumeChange, volume, currentTime, duration }) => {
+            const formatTime = (seconds) => {
+                const minutes = Math.floor(seconds / 60);// время трека
+                const remainingSeconds = Math.floor(seconds % 60);
+                return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+            };
+
+            return (
+                <div className="player-container">
+                    <div className="control">
+                        <button className="prev-button" onClick={onPrev}>⏮️</button>
+                        <button className="play-pause-button" onClick={onPlayPause}>
+                            {isPlaying ? '⏸️' : '▶️'}
+                        </button>
+                        <button className="next-button" onClick={onNext}>⏭️</button>
+                    </div>
+                    <div className="progress-bar-container">
+                        <div className="progress-bar" onClick={(e) => onSeek((e.nativeEvent.offsetX / e.target.clientWidth) * 100)}>
+                            <div className="progress" style={{ width: `${progress}%` }}></div>
+                        </div>
+                    </div>
+                    <div className="time-display">
+                        <span>{formatTime(currentTime)} / {formatTime(duration)}</span>
+                    </div>
+                    <div className="volume-control">
+                        <input type="range" min="0" max="1" step="0.01" value={volume} onChange={(e) => onVolumeChange(e.target.value)} />
+                    </div>
+                </div>
+            );
+        };
+
+        const Player = ({ track, album, onTrackChange }) => {
+            const [isPlaying, setIsPlaying] = React.useState(false);
+            const [progress, setProgress] = React.useState(0);
+            const [currentTime, setCurrentTime] = React.useState(0);
+            const [duration, setDuration] = React.useState(0);
+            const [volume, setVolume] = React.useState(0.5);
+
+            const audioRef = React.useRef(null);
+
+            React.useEffect(() => {
+                if (audioRef.current) {
+                    audioRef.current.volume = volume;
+
+                    if (isPlaying) {
+                        audioRef.current.play();
+                    } else {
+                        audioRef.current.pause();
+                    }
+                }
+            }, [isPlaying, volume, track]); // добавляем track в зависимости, чтобы реагировать на смену трека
+
+            const handleTimeUpdate = () => {
+                if (audioRef.current) {
+                    setCurrentTime(audioRef.current.currentTime);
+                    setDuration(audioRef.current.duration);
+                    setProgress((audioRef.current.currentTime / audioRef.current.duration) * 100);
+                }
+            };
+
+            const handleSeek = (newProgress) => {
+                if (audioRef.current) {
+                    const newTime = (newProgress / 100) * audioRef.current.duration;
+                    audioRef.current.currentTime = newTime;
+                    setProgress(newProgress);
+                }
+            };
+
+            const nextTrack = () => {
+                const nextIndex = (album.tracks.indexOf(track) + 1) % album.tracks.length;
+                onTrackChange(album.tracks[nextIndex], album);
+                setIsPlaying(true); // Устанавливаем воспроизведение для следующего трека
+            };
+
+            const prevTrack = () => {
+                const prevIndex = (album.tracks.indexOf(track) - 1 + album.tracks.length) % album.tracks.length;
+                onTrackChange(album.tracks[prevIndex], album);
+                setIsPlaying(true); // Устанавливаем воспроизведение для предыдущего трека
+            };
+
+            const togglePlayPause = () => {
+                setIsPlaying(!isPlaying);
+            };
+
+            const handleVolumeChange = (newVolume) => {
+                setVolume(newVolume);
+            };
+
+            return (
+                <div className="player">
+                    {track ? (
+                        <>
+                            <audio
+                                ref={audioRef}
+                                src={track.audioPath}
+                                onTimeUpdate={handleTimeUpdate}
+                                onEnded={nextTrack} // Переход к следующему треку при завершении текущего
+                                autoPlay={isPlaying} 
+                            />
+                            <div className="player-controls">
+                                <img src={album.imagePath} alt="Track Cover" className="track-cover" />
+                                <p>{track.title} - {album.artist}</p>
+                                <MusicPlayer
+                                    isPlaying={isPlaying}
+                                    onPlayPause={togglePlayPause}
+                                    progress={progress}
+                                    onSeek={handleSeek}
+                                    onPrev={prevTrack}
+                                    onNext={nextTrack}
+                                    onVolumeChange={handleVolumeChange}
+                                    volume={volume}
+                                    currentTime={currentTime}
+                                    duration={duration}
+                                />
+                            </div>
+                        </>
+                    ) : (
+                        <p>Выберите трек для воспроизведения</p>
+                    )}
+                </div>
+            );
+        };
+
+
+        const App = () => {
+            const [currentTrack, setCurrentTrack] = React.useState(null);
+            const [currentAlbum, setCurrentAlbum] = React.useState(null);
+
+            const handleTrackClick = (track, album) => {
+                setCurrentTrack(track);
+                setCurrentAlbum(album);
+            };
+
+            const handleTrackChange = (track, album) => {
+                setCurrentTrack(track);
+                setCurrentAlbum(album);
+            };
+
+            return (
+                <div className="app-container">
+                    <Sidebar />
+                    <MainContent onTrackClick={handleTrackClick} />
+                    <Player track={currentTrack} album={currentAlbum} onTrackChange={handleTrackChange} />
+                </div>
+            );
+        };
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+
+</html>
